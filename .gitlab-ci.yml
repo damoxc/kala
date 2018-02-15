@@ -1,0 +1,12 @@
+variables:
+  REGISTRY: registry.office.ukplc.corp/infrastructure/kala
+
+stages:
+- build
+
+build:
+  stage: build
+  script:
+  - docker build --pull -t "$REGISTRY:$CI_COMMIT_REF_SLUG" .
+  - docker tag "$REGISTRY:$CI_COMMIT_REF_SLUG" "$REGISTRY:$CI_COMMIT_SHA"
+  - docker push "$REGISTRY:$CI_COMMIT_REF_SLUG" && docker push "$REGISTRY:$CI_COMIT_SHA"
