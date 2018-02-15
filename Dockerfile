@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM python:3.6
 
 RUN apt-get update && apt-get install -y -yy uwsgi uwsgi-plugin-python3 python3-pip && mkdir /opt/kala
 COPY setup.py kala.py /opt/kala/
