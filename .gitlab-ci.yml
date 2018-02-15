@@ -12,5 +12,4 @@ build:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.office.ukplc.corp
   - docker build --pull -t "$REGISTRY:$CI_COMMIT_REF_SLUG" .
   - docker tag "$REGISTRY:$CI_COMMIT_REF_SLUG" "$REGISTRY:$CI_COMMIT_SHA"
-  - docker push "$REGISTRY:$CI_COMMIT_REF_SLUG"
-  - docker push "$REGISTRY:$CI_COMIT_SHA"
+  - docker push "$REGISTRY:$CI_COMMIT_REF_SLUG" && docker push "$REGISTRY:$CI_COMMIT_SHA"
