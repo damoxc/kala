@@ -38,7 +38,7 @@ if sentry_dsn:
     from raven.contrib.bottle import Sentry
     client = Client(sentry_dsn)
     app.catchall = False
-    app = Sentry(app, client)
+    sentry = Sentry(app, client)
 
 app.config.load_config(os.environ.get('KALA_CONFIGFILE', 'settings.ini'))
 
