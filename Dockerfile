@@ -3,7 +3,7 @@ FROM ubuntu:xenial
 RUN apt-get update && apt-get install -y -yy uwsgi uwsgi-plugin-python3 python3-pip && mkdir /opt/kala
 COPY setup.py kala.py /opt/kala/
 
-RUN pip3 install /opt/kala
+RUN pip3 install /opt/kala && pip3 install raven
 
 ENV UWSGI_BUFFER_SIZE 65536
 ENV UWSGI_EXTRA_UWSGI ""
