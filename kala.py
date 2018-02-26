@@ -32,14 +32,6 @@ app.config.update({
     'status.enable': False
 })
 
-sentry_dsn = os.environ.get('KALA_SENTRY_DSN', app.config.get('sentry.dsn'))
-if sentry_dsn:
-    from raven import Client
-    from raven.contrib.bottle import Sentry
-    client = Client(sentry_dsn)
-    app.catchall = False
-    sentry = Sentry(app, client)
-
 app.config.load_config(os.environ.get('KALA_CONFIGFILE', 'settings.ini'))
 
 app.install(MongoPlugin(
@@ -108,6 +100,16 @@ def status(mongodb):
             version = 'unknown'
 
     return {'version': version}
+
+
+# We want to install Sentry as the last part, otherwise bottle methods we expect to be on `app` don't exist.
+sentry_dsn = os.environ.get('KALA_SENTRY_DSN', app.config.get('sentry.dsn'))
+if sentry_dsn:
+    from raven import Client
+    from raven.contrib.bottle import Sentry
+    client = Client(sentry_dsn)
+    app.catchall = False
+    app = Sentry(app, client)
 
 
 def main():
