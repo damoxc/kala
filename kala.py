@@ -24,24 +24,24 @@ CORS_HEADERS = {
 }
 
 
-app = bottle.Bottle()
-app.config.update({
+bottle_app = app = bottle.Bottle()
+bottle_app.config.update({
     'mongodb.uri': 'mongodb://localhost:27017/',
     'mongodb.db': 'kala',
     'cors.enable': False,
     'status.enable': False
 })
 
-app.config.load_config(os.environ.get('KALA_CONFIGFILE', 'settings.ini'))
+bottle_app.config.load_config(os.environ.get('KALA_CONFIGFILE', 'settings.ini'))
 
-app.install(MongoPlugin(
-    uri=os.environ.get('KALA_MONGODB_URI', app.config['mongodb.uri']),
-    db=os.environ.get('KALA_MONGODB_DB', app.config['mongodb.db']),
+bottle_app.install(MongoPlugin(
+    uri=os.environ.get('KALA_MONGODB_URI', bottle_app.config['mongodb.uri']),
+    db=os.environ.get('KALA_MONGODB_DB', bottle_app.config['mongodb.db']),
     json_mongo=True))
 
 
-if os.environ.get('KALA_CORS_ENABLE', app.config['cors.enable']):
-    @app.hook('after_request')
+if os.environ.get('KALA_CORS_ENABLE', bottle_app.config['cors.enable']):
+    @bottle_app.hook('after_request')
     def add_cors_response_headers():
         if bottle.request.method in ('GET', 'OPTIONS'):
             bottle.response.set_header('Access-Control-Allow-Origin', '*')
@@ -53,7 +53,7 @@ def _get_json(name):
     return json.loads(result) if result else None
 
 
-@app.route('/<collection>')
+@bottle_app.route('/<collection>')
 def get(mongodb, collection):
     filter_ = _get_json('filter')
     projection = _get_json('projection')
@@ -82,9 +82,9 @@ def get(mongodb, collection):
 
     return {'results': [document for document in cursor]}
 
-@app.route('/_status')
+@bottle_app.route('/_status')
 def status(mongodb):
-    if os.environ.get('KALA_STATUS_ENABLE', app.config['status.enable']) in (False, '0'):
+    if os.environ.get('KALA_STATUS_ENABLE', bottle_app.config['status.enable']) in (False, '0'):
         raise bottle.HTTPError(status=403)
 
     try:
@@ -102,8 +102,8 @@ def status(mongodb):
     return {'version': version}
 
 
-# We want to install Sentry as the last part, otherwise bottle methods we expect to be on `app` don't exist.
-sentry_dsn = os.environ.get('KALA_SENTRY_DSN', app.config.get('sentry.dsn'))
+# We want to install Sentry as the last part, otherwise bottle methods we expect to be on `bottle_app` don't exist.
+sentry_dsn = os.environ.get('KALA_SENTRY_DSN', bottle_app.config.get('sentry.dsn'))
 if sentry_dsn:
     from raven import Client
     from raven.contrib.bottle import Sentry
@@ -113,7 +113,7 @@ if sentry_dsn:
 
 
 def main():
-    app.run()
+    bottle_app.run()
 
 
 if __name__ == '__main__':
