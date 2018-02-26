@@ -6,7 +6,6 @@ COPY setup.py kala.py /opt/kala/
 RUN pip3 install /opt/kala && pip3 install raven
 
 ENV UWSGI_BUFFER_SIZE 65536
-ENV UWSGI_EXTRA_UWSGI ""
 
 EXPOSE 5000
 
